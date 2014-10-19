@@ -1,4 +1,4 @@
-(ns ts_chat_client.core
+(ns ts-chat-client.core
   (:require [instaparse.core :as insta])
   (:import (java.net Socket)
            (java.io PrintWriter InputStreamReader BufferedReader))
@@ -31,14 +31,7 @@
     (.flush)))
 
 (defn handle-msg [msg]
-  (cond (or
-         (= msg "")
-         (= "TS3 Client" msg)
-         (= msg "Welcome to the TeamSpeak 3 ClientQuery interface, type
-            \"help\" for a list of commands and \"help <command>\" for
-            information on a specific command.")) nil
-            :else (println msg)))
-
+  (println msg))
 
 (defn conn-handler [conn]
   (while (nil? (:exit @conn))

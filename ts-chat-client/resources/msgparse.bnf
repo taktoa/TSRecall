@@ -1,0 +1,7 @@
+<S> := command attribute*;
+command := #'[a-zA-Z]+';
+attribute := <del> key <sep> value;
+del := ' '+;
+sep := '=';
+value := #'[^ =]+';
+key := #'[a-zA-Z]+';
