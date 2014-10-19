@@ -2,10 +2,9 @@
   (:require-macros [cljs.core.async.macros :refer [go-loop]])
   (:require [om.core :as om :include-macros true]
             [om.dom :as dom :include-macros true]
+            [cognitect.transit :as t]
             [cljs.core.async :refer [put! chan <!]]
-            [goog.events :as events])
-  (:import [goog.events EventType]
-           [goog.async Throttle]))
+            [ajax.core :as ajax]))
 
 (enable-console-print!)
 
@@ -23,7 +22,7 @@
     (-value [s] (str s)))
 
 (def app-state (atom {:input ""
-                      :output "Die in a fire."
+                      :result-list ["And now," "for something" "completely" "different"]
                       :channel (chan)}))
 
 (defn handle-input-change
@@ -32,15 +31,15 @@
           (om/update! app :title new-input)))
 
 (defn input-field
-  [app owner] 
-  (reify 
-    om/IRender 
-    (render [_] 
-      (dom/div #js 
-               {:id "input-field"} 
-               (dom/input #js 
-                          {:type "text" 
-                           :onChange #(handle-input-change % app) 
+  [app owner]
+  (reify
+    om/IRender
+    (render [_]
+      (dom/div #js
+               {:id "input-field"}
+               (dom/input #js
+                          {:type "text"
+                           :onChange #(handle-input-change % app)
                            :value (:input app)})))))
 
 (defn search-button-click
@@ -55,23 +54,23 @@
           om/IRender
           (render [_]
                   (dom/button #js {:id "search-button"
-                                   :onClick #(search-button-click app)} 
+                                   :onClick #(search-button-click app)}
                               "search"))))
 
-(defn output [app owner] (reify
-                           om/IRender
-                           (render [_]
-                             (dom/p nil (:output app)))))
+(defn results [app owner]
+  (om/component
+    (apply dom/ul #js {:className "keywords"}
+           (map (fn [text] (dom/li nil text)) (:result-list app)))))
 
 (defn search-database
   [app]
-  (swap! app-state assoc :text "Something completely different."))
+  nil)
 
 (defn dispatch
-    "Dispatches the incoming commands on the app channel."
-    [command params app]
-    (case command
-          :search (search-database app)))
+  "Dispatches the incoming commands on the app channel."
+  [command params app]
+  (case command
+    :search (search-database app)))
 
 (defn search-app
     [app owner]
@@ -90,9 +89,23 @@
         (dom/div #js {:className "container"}
                  (om/build search-button app)
                  (om/build input-field (:input app))
-                 (om/build output app)))))
+                 (om/build results app)))))
 
 (om/root
   search-app
   app-state
   {:target (. js/document (getElementById "app"))})
+
+(defn roundtrip [x]
+    (let [w (t/reader :json)
+                  r (t/reader :json)]
+          (t/read r (t/write w x))))
+
+(def test-reader (t/reader :json))
+;(println (t/read test-reader (ajax/GET "http://localhost:8080")))
+(println (ajax/GET "http://localhost:8080"))
+;(println (ajax/ajax-request {"localhost:8080" :get}))
+(println (ajax/ajax-request "localhost:8080" :get
+                            {:format (ajax/transit-request-format)
+                             :response-format (ajax/transit-response-format {:keywords? true})}))
+;(println (t/read test-reader "[[\"^ \",\"~:name\",\"Cardboardicus\",\"~:time\",122222,\"~:text\",\"goodnight\"],[\"^ \",\"^0\",\"VioletFox\",\"^1\",122255,\"^2\",\"no u\"]]"))
