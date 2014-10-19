@@ -4,7 +4,11 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [gloss "0.2.3"]]
+                 [com.datomic/datomic-free "0.9.4894"]
+                 [edu.cmu.sphinx/sphinx4-core "0.1.0-SNAPSHOT"]
+                 [edu.cmu.sphinx/sphinx4-data "0.1.0-SNAPSHOT"]
+                 [org.clojure/data.codec "0.1.0"]]
+  :repositories [["sonartype snapshots" {:url "https://oss.sonatype.org/content/repositories/snapshots"}]]
   :main ^:skip-aot ts-audio-ripper.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
