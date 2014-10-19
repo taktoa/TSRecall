@@ -103,9 +103,10 @@
 
 (def test-reader (t/reader :json))
 ;(println (t/read test-reader (ajax/GET "http://localhost:8080")))
-(println (ajax/GET "http://localhost:8080"))
+(t/read :json (ajax/GET "http://localhost:8080"))
+(println test-reader)
 ;(println (ajax/ajax-request {"localhost:8080" :get}))
-(println (ajax/ajax-request "localhost:8080" :get
-                            {:format (ajax/transit-request-format)
-                             :response-format (ajax/transit-response-format {:keywords? true})}))
+(println (ajax/ajax-request {"localhost:8080" :get
+                              :format (ajax/transit-request-format)
+                              :response-format (ajax/transit-response-format)}))
 ;(println (t/read test-reader "[[\"^ \",\"~:name\",\"Cardboardicus\",\"~:time\",122222,\"~:text\",\"goodnight\"],[\"^ \",\"^0\",\"VioletFox\",\"^1\",122255,\"^2\",\"no u\"]]"))
